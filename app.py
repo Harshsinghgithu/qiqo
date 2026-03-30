@@ -40,12 +40,12 @@ if uploaded_file is not None:
         if os.path.exists('results/output.csv'):
             df_results = pd.read_csv('results/output.csv')
             st.subheader("📊 Optimization Results")
-            st.dataframe(df_results, use_container_width=True)
+            st.dataframe(df_results, width="stretch")
 
         if os.path.exists('results/plots/comparison.png'):
             st.subheader("📈 Comparison Plot (Quantum vs Classical)")
             img = plt.imread('results/plots/comparison.png')
-            st.image(img, use_column_width=True)
+            st.image(img, width="stretch")
 
         st.success("🎉 Optimization complete! Check results/ folder.")
         

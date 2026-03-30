@@ -3,60 +3,51 @@ def compute_scores(df):
     df['Return'] = (df['Patents'] + df['Innovation']) / (df['RD'] + df['VC'] + 1e-6)
     return df
 
-
 def objective(df, alpha=0.5, beta=0.5):
     df['Z'] = alpha * df['Innovation'] + beta * df['Return']
     return df
 
-
 def india_sector_recommendation(df, alpha=0.5, beta=0.5):
     """
-    Recommend fund allocation for India sectors vs other countries.
-    Weights now respond to alpha/beta via Innovation/Return gaps.
+    Prioritize positive India gaps (strengths to amplify) for allocation %.
+    Varies with α Innovation vs β Return weights.
     """
-    from src.model import compute_scores, objective  # self-import for recompute
-    
-    # Recompute weighted scores
     df_computed = compute_scores(df.copy())
     df_computed = objective(df_computed, alpha=alpha, beta=beta)
     
     sectors = ['RD', 'VC', 'Startups', 'Patents']
     
-    # Global vs India Innovation/Return averages
+    # Global vs India
     global_inno = df_computed['Innovation'].mean()
     india_inno = df_computed[df_computed['Country'] == 'India']['Innovation'].mean()
     
     global_ret = df_computed['Return'].mean()
     india_ret = df_computed[df_computed['Country'] == 'India']['Return'].mean()
     
-    # Weighted Innovation gap (alpha affects relative priority)
     inno_gap = india_inno - global_inno
     ret_gap = india_ret - global_ret
     
     gaps = {
-        'RD': 0.4 * inno_gap + 0.5 * ret_gap,      # RD heavy Innovation
-        'VC': 0.3 * inno_gap + 0.5 * ret_gap,      # VC balanced
-        'Startups': 0.3 * inno_gap + 0.3 * ret_gap,  # Startups Innovation
-        'Patents': 0.2 * inno_gap + 1.0 * ret_gap    # Patents Return heavy
+        'RD': 0.4 * inno_gap + 0.3 * ret_gap,
+        'VC': 0.3 * inno_gap + 0.4 * ret_gap,
+        'Startups': 0.3 * inno_gap + 0.2 * ret_gap,
+        'Patents': 0.2 * inno_gap + 0.5 * ret_gap
     }
-    gaps_list = list(gaps.values())
+    gaps_list = [gaps[s] for s in sectors]
     
-    # Weight = -gap normalized (negative gap = higher priority)
-    max_weight = max(-g for g in gaps_list)
-    weights = [max(0, -gaps[s]) / max_weight * 100 for s in ['RD','VC','Startups','Patents']]
+    max_gap = max(gaps_list)
+    if max_gap <= 0:
+        weights = [25.0] * 4
+    else:
+        weights = [gap / max_gap * 100 for gap in gaps_list]
     
-    recs = []
-    for sector in ['RD','VC','Startups','Patents']:
-        priority = weights[['RD','VC','Startups','Patents'].index(sector)]
-        recs.append(f"{sector}: {priority:.1f}% (weighted gap: {gaps[sector]:.3f}, α={alpha}, β={beta})")
+    recs = [f"{sector}: {w:.1f}% (gap: {gaps[sector]:.3f}, α={alpha:.1f} β={beta:.1f})" for sector, w in zip(sectors, weights)]
     
     return {
-        'summary': f"🇮🇳 India Sector Recs (α={alpha:.1f} Innovation, β={beta:.1f} Return | total 100%)",
+        'summary': f"🇮🇳 India Recs (α={alpha:.1f} Innovation, β={beta:.1f} Return | amplify positive gaps)",
         'details': recs,
         'weights': weights,
-        'sectors': ['RD','VC','Startups','Patents'],
-        'gaps': gaps_list,
-        'alpha': alpha,
-        'beta': beta
+        'sectors': sectors,
+        'gaps': gaps_list
     }
 
