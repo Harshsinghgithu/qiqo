@@ -15,11 +15,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 Visit http://localhost:8501
-
-## Deploy to Streamlit Cloud (free)
-1. Create GitHub repo, push code (exclude venv/data/temp/results)
-2. streamlit.io → New app → Select repo → Set main file `app.py` → Deploy
-
 ## Architecture
 main.py: core pipeline
 src/: modules (data_loader, preprocessing min-max norm, model Z-score, qubo, solvers pure-python)
