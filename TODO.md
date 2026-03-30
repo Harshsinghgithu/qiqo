@@ -1,11 +1,9 @@
-# India Sector Recommendation Feature
+# India Sector Recs Parameter Responsive Fix
 Status: In Progress
 
-1. [x] Kill server (done)
-2. [x] Add india_sector_recommendation() to src/model.py
-3. [x] Update main.py to call & print recommendation
-4. [x] Update app.py to display recommendation after results + graphs/pie/insights
-5. [x] Restart streamlit run app.py
-6. [x] Test: Run optimization → Verify India recs w/ bar/pie charts shown
-7. ✅ COMPLETE
-
+1. [x] Kill streamlit server if running
+2. Update src/model.py: Add alpha/beta params to india_sector_recommendation(df, alpha, beta) → recompute compute_scores/objective before gaps → weighted Innovation gaps change with sliders
+3. Update main.py & app.py calls: pass alpha, beta to recs()
+4. Test: streamlit run app.py → Verify allocation % changes with alpha/beta sliders
+5. Git commit/push → Deploy auto-updates on Streamlit Cloud
+6. [ ] COMPLETE ✅

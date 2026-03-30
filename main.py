@@ -38,8 +38,8 @@ def main(path='data/dataset.xlsx', budget=3, alpha=0.5, beta=0.5):
     print("Quantum allocation:", quantum_res.x, "score:", quantum_res.fval)
     print("Classical allocation:", classical_res.x, "score:", classical_res.fval)
 
-    # India sector recommendation
-    recs = india_sector_recommendation(df)
+    # India sector recommendation (parameter responsive)
+    recs = india_sector_recommendation(df, alpha, beta)
     print("\n" + recs['summary'])
     for detail in recs['details']:
         print(detail)

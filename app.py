@@ -40,17 +40,17 @@ if uploaded_file is not None:
         if os.path.exists('results/output.csv'):
             df_results = pd.read_csv('results/output.csv')
             st.subheader("📊 Optimization Results")
-            st.dataframe(df_results, width="stretch")
+            st.dataframe(df_results, use_container_width=True)
 
         if os.path.exists('results/plots/comparison.png'):
             st.subheader("📈 Comparison Plot (Quantum vs Classical)")
             img = plt.imread('results/plots/comparison.png')
-            st.image(img, width="stretch")
+            st.image(img, use_column_width=True)
 
         st.success("🎉 Optimization complete! Check results/ folder.")
         
-        # India sector recommendations with graphs & pie chart
-        recs = india_sector_recommendation(df_results)
+        # India sector recommendations with graphs & pie chart (parameter responsive)
+        recs = india_sector_recommendation(df_results, alpha, beta)
         st.subheader("🇮🇳 India Sector Fund Allocation Recommendations")
         st.markdown(recs['summary'])
         for detail in recs['details']:
@@ -61,7 +61,7 @@ if uploaded_file is not None:
         with col1:
             fig, ax = plt.subplots()
             ax.bar(recs['sectors'], recs['gaps'])
-            ax.set_title('India vs Global: Sector Gaps (negative=prioritize)')
+            ax.set_title('India vs Global: Weighted Sector Gaps (neg=prioritize)')
             ax.set_ylabel('Gap')
             st.pyplot(fig)
 
@@ -71,7 +71,7 @@ if uploaded_file is not None:
             ax.set_title('Fund Allocation %')
             st.pyplot(fig)
 
-        st.markdown("**Insights:** Largest negative gap = highest priority (RD gap -0.260 → ~42% funds).")
+        st.markdown("**Insights:** Allocation changes with α Innovation/β Return weights. Neg gaps prioritized.")
 
 else:
     st.info("👆 Upload an Excel file to start")
